@@ -27,9 +27,9 @@ async function signup(e){
             number:number.value,
             password:password.value
         }
-        const response =await axios.post('http://localhost:3000/user/signup',userdetails)
+        console.log(userdetails)
+        const response = await axios.post('http://localhost:3000/user/signup',userdetails)
         form.reset();
-        window.location.href='loginPage.html';
     }
 }
 catch(err){
