@@ -26,12 +26,13 @@ async function login(e){
         const response=await axios.post('http://localhost:3000/user/login',userdetails)
         form.reset();
         localStorage.setItem('token',response.data.token);
+        window.location.href='../chat/chat.html';
     }
 }
 catch(err){
     console.log(err);
     msg.innerHTML="";
-  msg.innerHTML=msg.innerHTML+`<div>${err.response.data.message}</div>`;
+  msg.innerHTML=msg.innerHTML+`<div>${err.data.message}</div>`;
   setTimeout(()=>{
     msg.innerHTML="";
 },3000)

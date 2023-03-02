@@ -59,6 +59,11 @@ function generateAccessToken(id,name){
 exports.login= async (req,res,next)=>{
     try{
         const{email,password}=req.body;
+        if(isStringInvalid(email)||isStringInvalid(password)){
+
+            return res.status(400).json({message:"Bad parameters:Something is missing"})
+        }
+
         const user= await User.findAll({where:{email:email}});
         //console.log(user);
         if(user.length>0)

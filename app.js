@@ -19,10 +19,19 @@ app.use(bodyParser.json({extended:false}));
 
 const sequelize=require('./util/database');
 
+const User=require('./models/users');
+
+const Chat=require('./models/chat');
+
 const UserRoutes=require('./routes/users');
 
+const MessageRoutes=require('./routes/chat');
 
-app.use('/user',UserRoutes)
+User.hasMany(Chat);
+Chat.belongsTo(User);
+
+app.use('/user',UserRoutes);
+app.use('/chat',MessageRoutes);
 
 sequelize.sync( /* {force:true} */ )
 .then(()=>{

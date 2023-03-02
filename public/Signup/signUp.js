@@ -35,7 +35,7 @@ async function signup(e){
 catch(err){
     console.log(err);
     msg.innerHTML=""
-  msg.innerHTML=msg.innerHTML+`<div>${err.response.data.message}</div>`;
+  msg.innerHTML=msg.innerHTML+`<div>${err.data.message}</div>`;
   setTimeout(()=>{
     msg.innerHTML="";
 },3000)
