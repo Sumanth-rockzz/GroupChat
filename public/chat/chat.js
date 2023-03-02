@@ -26,7 +26,6 @@ async function sendmessage(e){
                console.log(response.data,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                
                     showmessage(response.data.message.username,response.data.message.message)
-
                     message.value='';
            }
        }
@@ -40,26 +39,68 @@ async function sendmessage(e){
        }
     }
 
+    //decode token
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
     async function showmessage(username,message){
         try{
-            chattable.innerHTML+=`<tr><td>${username}-${message}</td></tr>`;
+            const token=localStorage.getItem('token');
+            const decodedtoken=parseJwt(token);
+            let className;
+            if(username===decodedtoken.name)
+            {
+              className='currentuser'
+            }
+            else{
+                className-'otheruser'
+            }
+            chattable.className="tbody";
+            chattable.innerHTML+=`<tr class=${className}><td>${username}-${message}</td></tr>`;
         }catch(err){
             console.log(err);
         }
     }
 
+
     window.addEventListener('DOMContentLoaded',getchats);
 
-    async function getchats(e){
+    async function getchats(){
         try{
-            e.preventDefault();
-              
-                   const response= await axios.get('http://localhost:3000/chat/get-message')
-    
-                   console.log(response,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                   
-                   for(let i=0;i<response.data.message.length;i++)
-                        showmessage(response.data.message[i].username,response.data.message[i].message)
+                   let lastmsgId=JSON.parse(localStorage.getItem('lastmsgId'));
+                   console.log(lastmsgId,">>>>>>>>>>>>")
+                   const response= await axios.get(`http://localhost:3000/chat/get-message/${lastmsgId}`)
+                   console.log(response,">>>>>>>>>>>>>")
+                   lastmsgId+=parseInt(response.data.message.length);
+                   console.log(lastmsgId,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+                  
+                   let existingArray=JSON.parse(localStorage.getItem('messages'))||[];
+
+                   if(existingArray.length>=10){
+                    existingArray=[];
+                   }
+
+                   let responseArray=response.data.message;
+
+                   let mergedArray=existingArray.concat(responseArray);
+
+                   localStorage.setItem('lastmsgId',JSON.stringify(lastmsgId));
+
+                   localStorage.setItem('messages',JSON.stringify(mergedArray));
+
+                   chattable.innerHTML='';
+
+                   for(let i=0;i<mergedArray.length;i++){
+                        showmessage(mergedArray[i].username,mergedArray[i].message)
+                   }
+                   chattable.scrollTop=chattable.scrollHeight;
                   
            }
            catch(err){
@@ -71,3 +112,9 @@ async function sendmessage(e){
            },3000)
            }
         }
+
+    /*  setInterval(()=>{
+            getchats();
+        },1000);  */
+
+   

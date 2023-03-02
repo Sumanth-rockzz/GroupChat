@@ -19,7 +19,12 @@ exports.sendMessage=async (req,res,next)=>{
 
 exports.getMessages=async(req,res,next)=>{
 try{
-    const  messages = await Chat.findAll();
+    const lastmsgId=+req.params.lastmsgId||0;
+    console.log(lastmsgId);
+    const  messages = await Chat.findAll({
+       offset:lastmsgId,
+       limit:10
+    });
          res.status(200).json({message:messages})
 }catch(err){
     console.log(err,">>>>>>>>>>>>>>>");
