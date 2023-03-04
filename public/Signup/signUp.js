@@ -30,12 +30,13 @@ async function signup(e){
         console.log(userdetails)
         const response = await axios.post('http://localhost:3000/user/signup',userdetails)
         form.reset();
+        window.location.href='../Login/loginPage.html'
     }
 }
 catch(err){
     console.log(err);
     msg.innerHTML=""
-  msg.innerHTML=msg.innerHTML+`<div>${err.data.message}</div>`;
+  msg.innerHTML=msg.innerHTML+`<div>${err.response.data.message}</div>`;
   setTimeout(()=>{
     msg.innerHTML="";
 },3000)

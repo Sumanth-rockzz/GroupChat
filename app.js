@@ -10,7 +10,6 @@ const bodyParser=require('body-parser');
 require('dotenv').config();
 
 
-
 app.use(cors({
     origin:"*"
 }));
@@ -23,15 +22,33 @@ const User=require('./models/users');
 
 const Chat=require('./models/chat');
 
+const Group=require('./models/group')
+
+const UserGroup=require('./models/usergroup')
+
 const UserRoutes=require('./routes/users');
 
 const MessageRoutes=require('./routes/chat');
 
+const GroupRoutes=require('./routes/group');
+
 User.hasMany(Chat);
 Chat.belongsTo(User);
 
+User.belongsToMany(Group,{through :UserGroup}); 
+ Group.belongsToMany(User,{through :UserGroup});
+
+Group.hasMany(Chat);
+Chat.belongsTo(Group);
+
+
 app.use('/user',UserRoutes);
 app.use('/chat',MessageRoutes);
+app.use('/group',GroupRoutes);
+
+app.use('/',(req,res,next)=>{
+    res.status(404).send("<h1>OOPS! Page Not Found </h1>");
+})
 
 sequelize.sync( /* {force:true} */ )
 .then(()=>{
