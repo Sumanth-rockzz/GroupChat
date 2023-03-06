@@ -2,6 +2,10 @@ const chattable=document.getElementById('chattable');
 
 const message=document.getElementById('message');
 
+const uploadbtn=document.getElementById('uploadbtn');
+
+const file=document.getElementById('file');
+
 const sendbtn=document.getElementById('sendbtn');
 
 const memberlist=document.getElementById('memberslist');
@@ -130,10 +134,10 @@ function parseJwt (token) {
            }
         }
 
-         setInterval(()=>{
+        /*  setInterval(()=>{
             getchats();
             getgroupmembers();
-        },1000);  
+        },1000);   */
 
         async function getgroupmembers(){
             try{
@@ -142,6 +146,7 @@ function parseJwt (token) {
                 const response= await axios.get(`http://localhost:3000/group/get-members?groupId=${groupId}`);
                 console.log(response);
                 adminname.innerHTML=`Admin-${response.data.username.username}`;
+                memberlist.innerHTML='';
                 for(let i=0;i<response.data.message.length;i++){
                     memberlist.innerHTML+=`<li>${response.data.message[i].username}</li>`;
                 }
@@ -171,6 +176,40 @@ function parseJwt (token) {
             window.location.href='../Group/group.html';
 
             
+        }catch(err){
+            console.log(err);
+            msg.innerHTML="";
+          msg.innerHTML=msg.innerHTML+`<div>${err.response.data.message}</div>`;
+          setTimeout(()=>{
+            msg.innerHTML="";
+        },3000)
+        }
+       }
+
+       uploadbtn.addEventListener('click',uploadFile);
+
+       async function uploadFile(e){
+        try{
+            e.preventDefault();
+            const uploadedfile=file.files[0];
+            console.log(uploadedfile);
+            if(!uploadedfile){
+               msg.innerHTML="Please Upload a file ";
+               setTimeout(()=>{
+                   msg.innerHTML="";
+               },3000)
+           }
+           else{
+            const formData=new FormData();
+            formData.append('file',uploadedfile);
+            console.log(formData);
+            const groupId=JSON.parse(localStorage.getItem('groupId'));
+            const token=localStorage.getItem('token');
+            const response=await axios.post(`http://localhost:3000/chat/sendfile/${groupId}`,formData,{headers:{"Authorization":token,'Content-Type':'multipart/form-data'}});
+                console.log(response);
+                showmessage(response.data.message.username,response.data.message.message)
+                uploadedfile.value=null;
+           }
         }catch(err){
             console.log(err);
             msg.innerHTML="";
