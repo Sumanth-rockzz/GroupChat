@@ -18,6 +18,20 @@ app.use(cors({
     origin:"*"
 }));
 
+
+const io = require('socket.io')(8000,{
+    cors: {
+        origin: '*',
+      }
+});
+
+io.on('connection', socket => {
+    socket.on('send-message', room => {
+        console.log(room);
+        io.emit('receive-message', room);
+    });
+})
+
 app.use(bodyParser.json({extended:false}));
 
 const path = require('path');
